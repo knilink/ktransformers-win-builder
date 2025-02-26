@@ -16,7 +16,11 @@ git clone https://github.com/yourusername/ktransformers-win-builder.git
 cd ktransformers-win-builder
 .\run.ps1 -Preset ./presets/cp311cu126.ps1 -TorchCudaArchList "8.9;8.6;7.5;6.1" -CompilerMemory "8G" -CompilerCpus "4" -Branch "pull/622/head"
 ```
-This will build the Docker image and start the compilation process using the specified preset configuration.
+This will build the Docker image and start the compilation process using the specified preset configuration. Output can be found in `dist` folder.
+Then
+```powershell
+pip install ./dist/ktransformers-0.2.1.post1-cp311-cp311-win_amd64.whl
+```
 
 Explanations:
 - `-Preset ./presets/cp311cu126.ps1`: Loads a specific CUDA version, Python version, etc., from the provided file.
@@ -29,3 +33,4 @@ Explanations:
 - Customize the preset file for different build targets, `python` and `cuda` are installed via [Chocolatey package index](https://community.chocolatey.org/packages). So make sure the package version exists in the index.
 - To debug or build manually, run `docker run --rm -it --memory="8G" -v </path/to/ktransformers>:"C:/ktransformers" ktransformers-builder:<tag>` to enter a shell environment with all dependencies installed.
 - Image building and source compiling may hang if running out of disk space.
+- Remember to cleanup unwanted images and containers to free up space.
