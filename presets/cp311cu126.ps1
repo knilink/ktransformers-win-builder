@@ -1,5 +1,0 @@
-$CudaVersion = "12.6.3.561"
-$CudaPath = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6"
-$PythonVersion = "3.11.9"
-$TorchIndexUrl = "https://download.pytorch.org/whl/cu126"
-$ImageTag = "cp311cu126"

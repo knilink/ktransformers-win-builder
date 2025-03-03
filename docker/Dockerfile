@@ -1,8 +1,26 @@
 # escape=`
 
+ARG PYTHON_VERSION_MAJOR
+ARG PYTHON_VERSION_MINOR
+ARG PYTHON_VERSION_PATCH
+ARG PYTHON_VERSION="${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.${PYTHON_VERSION_PATCH}"
+ARG PYTHON_PATH="C:/python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}"
+
+ARG CUDA_VERSION_MAJOR
+ARG CUDA_VERSION_MINOR
+ARG CUDA_VERSION_PATCH
+ARG CUDA_DRIVER_VERSION
+ARG CUDA_VERSION="${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}.${CUDA_VERSION_PATCH}.${CUDA_DRIVER_VERSION}"
+ARG CUDA_PATH="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}"
+ARG TORCH_INDEX_URL="https://download.pytorch.org/whl/cu${CUDA_VERSION_MAJOR}${CUDA_VERSION_MINOR}"
+
+
+
 # https://learn.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2022
 # Use the latest Windows Server Core 2022 image.
 FROM mcr.microsoft.com/windows/servercore:ltsc2022 as base
+# Restore the default Windows shell for correct batch processing.
+SHELL ["cmd", "/S", "/C"]
 # install choco
 RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
 
@@ -15,11 +33,18 @@ RUN choco install -y cuda --version %CUDA_VERSION%
 
 
 
+FROM base as python
+ARG PYTHON_VERSION
+RUN choco install -y python --version=%PYTHON_VERSION%
+RUN pip install setuptools wheel packaging ninja
+# install pytorch
+# https://pytorch.org/get-started/locally/
+ARG TORCH_INDEX_URL
+RUN pip install torch --index-url %TORCH_INDEX_URL%
+
+
 
 FROM base
-
-# Restore the default Windows shell for correct batch processing.
-SHELL ["cmd", "/S", "/C"]
 
 # https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022
 RUN `
@@ -46,14 +71,9 @@ RUN choco install -y git --cache C:/cache
 ARG PYTHON_VERSION
 RUN choco install -y python --version=%PYTHON_VERSION% --cache C:/cache
 
-RUN pip install setuptools wheel packaging ninja --cache-dir C:/cache
 
-# install pytorch
-# https://pytorch.org/get-started/locally/
-ARG TORCH_INDEX_URL
-RUN pip3 install torch --index-url %TORCH_INDEX_URL% --cache-dir C:/cache
-
-
+ARG PYTHON_PATH
+COPY --from=python ${PYTHON_PATH} ${PYTHON_PATH}
 ARG CUDA_PATH
 COPY --from=cudatookit ${CUDA_PATH} ${CUDA_PATH}
 
