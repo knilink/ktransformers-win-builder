@@ -1,5 +1,5 @@
 param (
-    [string]$RemoteBranch = "main"  # Default branch is "main"
+    [string]$Reference = "main"  # Default branch is "main"
 )
 
 echo ${RemoteBranch}
@@ -20,7 +20,7 @@ if (-not (Test-Path -Path ${DistDir})) {
 
 git init C:/ktransformers
 cd C:/ktransformers
-git fetch https://github.com/kvcache-ai/ktransformers.git $RemoteBranch --depth 1
+git fetch https://github.com/kvcache-ai/ktransformers.git $Reference --depth 1
 git checkout FETCH_HEAD
 git submodule update --init --recursive --depth 1
 pip install -r requirements-local_chat.txt
