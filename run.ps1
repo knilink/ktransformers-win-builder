@@ -8,6 +8,8 @@ param (
   [string]$PythonVersion = $null
 )
 
+$ErrorActionPreference = "Stop"
+
 function Get-PythonVersion {
   if ($PythonVersion) {
     return $PythonVersion

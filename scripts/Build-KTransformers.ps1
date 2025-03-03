@@ -2,7 +2,8 @@ param (
     [string]$Reference = "main"  # Default branch is "main"
 )
 
-echo ${RemoteBranch}
+$ErrorActionPreference = "Stop"
+$env:KTRANSFORMERS_FORCE_BUILD = "TRUE"
 
 # Assert TORCH_CUDA_ARCH_LIST is set
 if (-not $env:TORCH_CUDA_ARCH_LIST) {
